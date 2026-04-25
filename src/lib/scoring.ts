@@ -75,7 +75,7 @@ export function calcMatchScore(
   const common = Object.keys(userRatings).filter(
     (r) => aggregateAverages[r] !== undefined
   );
-  if (common.length === 0) return null;
+  if (common.length < 5) return null;
 
   const totalDeviation = common.reduce((sum, r) => {
     return sum + Math.abs(userRatings[r] - aggregateAverages[r]) / 9;

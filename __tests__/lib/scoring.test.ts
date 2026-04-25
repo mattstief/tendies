@@ -99,29 +99,35 @@ describe('calcMatchScore', () => {
     expect(calcMatchScore({ "Popeyes": 8 }, { "Cane's": 7 })).toBeNull();
   });
 
-  it('returns 100 when user ratings exactly match aggregate', () => {
-    const ratings = { "Popeyes": 8, "Cane's": 7 };
-    const aggregate = { "Popeyes": 8, "Cane's": 7 };
+  it('returns null when fewer than 5 restaurants overlap', () => {
+    const ratings = { "Popeyes": 8, "Cane's": 7, "Wendy's": 6, "Sonic": 5 };
+    const aggregate = { "Popeyes": 8, "Cane's": 7, "Wendy's": 6, "Sonic": 5 };
+    expect(calcMatchScore(ratings, aggregate)).toBeNull();
+  });
+
+  it('returns 100 when user ratings exactly match aggregate (5+ overlap)', () => {
+    const ratings = { "Popeyes": 8, "Cane's": 7, "Wendy's": 6, "Sonic": 5, "HEB": 9 };
+    const aggregate = { "Popeyes": 8, "Cane's": 7, "Wendy's": 6, "Sonic": 5, "HEB": 9 };
     expect(calcMatchScore(ratings, aggregate)).toBe(100);
   });
 
   it('returns 0 when all deviations are maximal (9 points off)', () => {
-    const ratings = { "Popeyes": 1 };
-    const aggregate = { "Popeyes": 10 };
+    const ratings = { "Popeyes": 1, "Cane's": 1, "Wendy's": 1, "Sonic": 1, "HEB": 1 };
+    const aggregate = { "Popeyes": 10, "Cane's": 10, "Wendy's": 10, "Sonic": 10, "HEB": 10 };
     expect(calcMatchScore(ratings, aggregate)).toBe(0);
   });
 
   it('only uses restaurants present in both user ratings and aggregate', () => {
-    // "Cane's" is not in aggregate — should not affect score
-    const ratings = { "Popeyes": 8, "Cane's": 1 };
-    const aggregate = { "Popeyes": 8 };
+    // "McDonald's" is not in aggregate — should not affect score
+    const ratings = { "Popeyes": 8, "Cane's": 7, "Wendy's": 6, "Sonic": 5, "HEB": 9, "McDonald's": 1 };
+    const aggregate = { "Popeyes": 8, "Cane's": 7, "Wendy's": 6, "Sonic": 5, "HEB": 9 };
     expect(calcMatchScore(ratings, aggregate)).toBe(100);
   });
 
   it('calculates partial match correctly', () => {
-    // Deviation of 4.5 out of 9 = 50% deviation → 50% match
-    const ratings = { "Popeyes": 1 };
-    const aggregate = { "Popeyes": 5.5 };
+    // Each restaurant: deviation of 4.5 out of 9 = 50% deviation → 50% match
+    const ratings = { "Popeyes": 1, "Cane's": 1, "Wendy's": 1, "Sonic": 1, "HEB": 1 };
+    const aggregate = { "Popeyes": 5.5, "Cane's": 5.5, "Wendy's": 5.5, "Sonic": 5.5, "HEB": 5.5 };
     expect(calcMatchScore(ratings, aggregate)).toBe(50);
   });
 });
