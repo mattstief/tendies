@@ -50,13 +50,25 @@ export async function GET(req: NextRequest) {
       return b.average - a.average;
     });
 
+  const joinTimes = await Promise.all(
+    users.map((user) => redis.get(`joined:${user}`))
+  );
+  const joinedAt: Record<string, number> = {};
+  users.forEach((user, i) => {
+    joinedAt[user] = Number(joinTimes[i] ?? 0);
+  });
+
   const userBreakdown = users
     .map((user) => ({
       username: user,
       ratingCount: Object.keys(allRatings[user]).length,
       matchScore: calcMatchScore(allRatings[user], aggregateAverages),
     }))
-    .sort((a, b) => b.ratingCount - a.ratingCount);
+    .sort((a, b) =>
+      b.ratingCount !== a.ratingCount
+        ? b.ratingCount - a.ratingCount
+        : joinedAt[a.username] - joinedAt[b.username]
+    );
 
   return NextResponse.json({ restaurants, users: userBreakdown, total: RESTAURANTS.length });
 }

@@ -8,6 +8,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Username required' }, { status: 400 });
   }
   await redis.sadd('users', username);
+  await redis.set(`joined:${username}`, Date.now(), { nx: true });
   const res = NextResponse.json({ ok: true });
   res.cookies.set('tendies_username', username, {
     maxAge: 60 * 60 * 24 * 365,
