@@ -24,18 +24,17 @@ interface TotalsData {
   users: UserRow[];
   total: number;
   reveal: boolean;
+  revealStarted: string | null;
+}
+
+function revealKey(started: string) {
+  return `tendies_reveal_seen_${started}`;
 }
 
 export default function TotalsPage() {
   const router = useRouter();
   const [data, setData] = useState<TotalsData | null>(null);
   const [revealDismissed, setRevealDismissed] = useState(false);
-
-  useEffect(() => {
-    if (localStorage.getItem('tendies_reveal_seen') === '1') {
-      setRevealDismissed(true);
-    }
-  }, []);
 
   useEffect(() => {
     async function fetchTotals() {
@@ -45,7 +44,11 @@ export default function TotalsPage() {
         return;
       }
       if (res.ok) {
-        setData(await res.json());
+        const json: TotalsData = await res.json();
+        setData(json);
+        if (json.revealStarted && localStorage.getItem(revealKey(json.revealStarted)) === '1') {
+          setRevealDismissed(true);
+        }
       }
     }
 
@@ -89,7 +92,9 @@ export default function TotalsPage() {
           restaurants={data.restaurants}
           users={data.users}
           onDismiss={() => {
-            localStorage.setItem('tendies_reveal_seen', '1');
+            if (data.revealStarted) {
+              localStorage.setItem(revealKey(data.revealStarted), '1');
+            }
             setRevealDismissed(true);
           }}
         />

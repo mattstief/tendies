@@ -9,10 +9,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Not logged in' }, { status: 401 });
   }
 
-  const [users, restaurantList, revealActive] = await Promise.all([
+  const [users, restaurantList, revealActive, revealStarted] = await Promise.all([
     redis.smembers('users'),
     getRestaurants(redis),
     redis.get('reveal:active'),
+    redis.get('reveal:started'),
   ]);
 
   if (!revealActive) {
@@ -81,5 +82,5 @@ export async function GET(req: NextRequest) {
       return joinedAt[a.username] - joinedAt[b.username];
     });
 
-  return NextResponse.json({ restaurants, users: userBreakdown, total: restaurantList.length, reveal: !!revealActive });
+  return NextResponse.json({ restaurants, users: userBreakdown, total: restaurantList.length, reveal: !!revealActive, revealStarted: revealStarted ?? null });
 }
