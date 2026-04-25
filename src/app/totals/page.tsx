@@ -29,9 +29,13 @@ interface TotalsData {
 export default function TotalsPage() {
   const router = useRouter();
   const [data, setData] = useState<TotalsData | null>(null);
-  const [revealDismissed, setRevealDismissed] = useState(() =>
-    typeof window !== 'undefined' && localStorage.getItem('tendies_reveal_seen') === '1'
-  );
+  const [revealDismissed, setRevealDismissed] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem('tendies_reveal_seen') === '1') {
+      setRevealDismissed(true);
+    }
+  }, []);
 
   useEffect(() => {
     async function fetchTotals() {
