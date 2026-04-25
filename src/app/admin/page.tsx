@@ -17,7 +17,9 @@ export default function AdminPage() {
   const [usersData, setUsersData] = useState<UsersData | null>(null);
   const [restaurants, setRestaurants] = useState<string[]>([]);
   const [newRestaurant, setNewRestaurant] = useState('');
-  const [addError, setAddError] = useState('');
+  const [newUsername, setNewUsername] = useState('');
+  const [addRestaurantError, setAddRestaurantError] = useState('');
+  const [addUserError, setAddUserError] = useState('');
 
   async function loadUsers() {
     const res = await fetch('/api/admin/users');
@@ -34,9 +36,33 @@ export default function AdminPage() {
     loadRestaurants();
   }, []);
 
+  async function addUser() {
+    const username = newUsername.trim();
+    if (!username) return;
+    setAddUserError('');
+    const res = await fetch('/api/admin/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username }),
+    });
+    if (res.ok) {
+      setNewUsername('');
+      loadUsers();
+    } else {
+      const j = await res.json();
+      setAddUserError(j.error ?? 'Failed to add');
+    }
+  }
+
   async function removeUser(username: string) {
     if (!confirm(`Remove "${username}" entirely?`)) return;
     await fetch(`/api/admin/users/${encodeURIComponent(username)}`, { method: 'DELETE' });
+    loadUsers();
+  }
+
+  async function deleteAllUsers() {
+    if (!confirm('Delete ALL users and their data?')) return;
+    await fetch('/api/admin/users', { method: 'DELETE' });
     loadUsers();
   }
 
@@ -71,7 +97,7 @@ export default function AdminPage() {
   async function addRestaurant() {
     const name = newRestaurant.trim();
     if (!name) return;
-    setAddError('');
+    setAddRestaurantError('');
     const res = await fetch('/api/admin/restaurants', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -82,7 +108,7 @@ export default function AdminPage() {
       loadRestaurants();
     } else {
       const j = await res.json();
-      setAddError(j.error ?? 'Failed to add');
+      setAddRestaurantError(j.error ?? 'Failed to add');
     }
   }
 
@@ -95,15 +121,16 @@ export default function AdminPage() {
 
       <section className="admin-section">
         <p className="admin-section-title">Global Actions</p>
-        <button className="btn-danger" onClick={deleteAllRatings}>
-          Delete All Ratings
-        </button>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <button className="btn-danger" onClick={deleteAllRatings}>Delete All Ratings</button>
+          <button className="btn-danger" onClick={deleteAllUsers}>Delete All Users</button>
+        </div>
       </section>
 
       <section className="admin-section">
         <p className="admin-section-title">Users ({usersData?.users.length ?? 0})</p>
         {usersData?.users.length === 0 && (
-          <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>No users yet.</p>
+          <p style={{ color: 'var(--text-dim)', fontSize: '14px', marginBottom: '8px' }}>No users yet.</p>
         )}
         {usersData?.users.map((u) => (
           <div key={u.username} className="admin-row">
@@ -117,6 +144,17 @@ export default function AdminPage() {
             </div>
           </div>
         ))}
+        <div className="admin-add-form">
+          <input
+            className="admin-input"
+            placeholder="New username"
+            value={newUsername}
+            onChange={(e) => setNewUsername(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && addUser()}
+          />
+          <button className="btn-primary btn-sm" onClick={addUser}>Add</button>
+        </div>
+        {addUserError && <p className="admin-error">{addUserError}</p>}
       </section>
 
       <section className="admin-section">
@@ -137,7 +175,7 @@ export default function AdminPage() {
           />
           <button className="btn-primary btn-sm" onClick={addRestaurant}>Add</button>
         </div>
-        {addError && <p className="admin-error">{addError}</p>}
+        {addRestaurantError && <p className="admin-error">{addRestaurantError}</p>}
       </section>
     </div>
   );
