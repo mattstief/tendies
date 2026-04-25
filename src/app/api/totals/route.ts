@@ -68,11 +68,14 @@ export async function GET(req: NextRequest) {
       ratingCount: Object.keys(allRatings[user]).length,
       matchScore: calcMatchScore(allRatings[user], aggregateAverages),
     }))
-    .sort((a, b) =>
-      b.ratingCount !== a.ratingCount
-        ? b.ratingCount - a.ratingCount
-        : joinedAt[a.username] - joinedAt[b.username]
-    );
+    .sort((a, b) => {
+      if (b.ratingCount !== a.ratingCount) return b.ratingCount - a.ratingCount;
+      if (a.matchScore === null && b.matchScore === null) return 0;
+      if (a.matchScore === null) return 1;
+      if (b.matchScore === null) return -1;
+      if (b.matchScore !== a.matchScore) return b.matchScore - a.matchScore;
+      return joinedAt[a.username] - joinedAt[b.username];
+    });
 
   return NextResponse.json({ restaurants, users: userBreakdown, total: restaurantList.length, reveal: !!revealActive });
 }

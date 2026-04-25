@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { RestaurantList } from './RestaurantList';
 import { RatingSheet } from './RatingSheet';
@@ -20,12 +20,24 @@ interface TiePair {
   score: number;
 }
 
-export function HomeClient({ restaurants, initialRatings, initialPreferences }: HomeClientProps) {
+export function HomeClient({ restaurants: initialRestaurants, initialRatings, initialPreferences }: HomeClientProps) {
+  const [restaurants, setRestaurants] = useState<string[]>(initialRestaurants);
   const [ratings, setRatings] = useState<Ratings>(initialRatings);
   const [preferences, setPreferences] = useState<Preferences>(initialPreferences);
   const [activeRestaurant, setActiveRestaurant] = useState<string | null>(null);
   const [tiePairs, setTiePairs] = useState<TiePair[] | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    const id = setInterval(async () => {
+      const res = await fetch('/api/admin/restaurants');
+      if (res.ok) {
+        const { restaurants: updated } = await res.json();
+        setRestaurants(updated);
+      }
+    }, 5000);
+    return () => clearInterval(id);
+  }, []);
 
   const ratedCount = Object.keys(ratings).length;
 

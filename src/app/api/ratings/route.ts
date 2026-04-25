@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import redis from '@/lib/redis';
+import { recomputeAllMatchScores } from '@/lib/matchScores';
 
 export async function GET(req: NextRequest) {
   const username = req.cookies.get('tendies_username')?.value;
@@ -40,5 +41,6 @@ export async function POST(req: NextRequest) {
   }
 
   await redis.hset(`ratings:${username}`, { [restaurant]: score.toString() });
+  recomputeAllMatchScores().catch(() => {});
   return NextResponse.json({ ok: true });
 }
