@@ -56,12 +56,7 @@ export async function GET(req: NextRequest) {
       ratingCount: Object.keys(allRatings[user]).length,
       matchScore: calcMatchScore(allRatings[user], aggregateAverages),
     }))
-    .sort((a, b) => {
-      if (a.matchScore === null && b.matchScore === null) return 0;
-      if (a.matchScore === null) return 1;
-      if (b.matchScore === null) return -1;
-      return b.matchScore - a.matchScore;
-    });
+    .sort((a, b) => b.ratingCount - a.ratingCount);
 
   return NextResponse.json({ restaurants, users: userBreakdown, total: RESTAURANTS.length });
 }
