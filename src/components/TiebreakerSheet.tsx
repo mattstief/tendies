@@ -57,7 +57,7 @@ export function TiebreakerSheet({ pairs, onComplete }: TiebreakerSheetProps) {
         </div>
 
         <button className="btn-ghost" onClick={() => pick('tie')}>
-          They're equal — keep the tie
+          They&apos;re equal — keep the tie
         </button>
       </div>
     </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { RestaurantList } from './RestaurantList';
 import { RatingSheet } from './RatingSheet';
@@ -10,7 +10,6 @@ import { RESTAURANTS } from '@/lib/restaurants';
 import type { Ratings, Preferences } from '@/lib/scoring';
 
 interface HomeClientProps {
-  username: string;
   initialRatings: Ratings;
   initialPreferences: Preferences;
 }
@@ -21,7 +20,7 @@ interface TiePair {
   score: number;
 }
 
-export function HomeClient({ username, initialRatings, initialPreferences }: HomeClientProps) {
+export function HomeClient({ initialRatings, initialPreferences }: HomeClientProps) {
   const [ratings, setRatings] = useState<Ratings>(initialRatings);
   const [preferences, setPreferences] = useState<Preferences>(initialPreferences);
   const [activeRestaurant, setActiveRestaurant] = useState<string | null>(null);

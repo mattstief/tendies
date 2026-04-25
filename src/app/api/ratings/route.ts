@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
 
   const ratings: Record<string, number> = {};
   for (const [k, v] of Object.entries(rawRatings ?? {})) {
-    ratings[k] = parseInt(v, 10);
+    ratings[k] = parseInt(String(v), 10);
   }
 
   return NextResponse.json({ ratings, preferences: rawPreferences ?? {} });

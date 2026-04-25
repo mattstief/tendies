@@ -18,14 +18,13 @@ export default async function Page() {
 
   const ratings: Record<string, number> = {};
   for (const [k, v] of Object.entries(rawRatings ?? {})) {
-    ratings[k] = parseInt(v, 10);
+    ratings[k] = parseInt(String(v), 10);
   }
 
   return (
     <HomeClient
-      username={username}
       initialRatings={ratings}
-      initialPreferences={rawPreferences ?? {}}
+      initialPreferences={(rawPreferences as Record<string, string>) ?? {}}
     />
   );
 }

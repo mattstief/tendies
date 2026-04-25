@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
       const raw = await redis.hgetall(`ratings:${user}`);
       const ratings: Record<string, number> = {};
       for (const [k, v] of Object.entries(raw ?? {})) {
-        ratings[k] = parseInt(v, 10);
+        ratings[k] = parseInt(String(v), 10);
       }
       allRatings[user] = ratings;
     })

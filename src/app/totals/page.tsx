@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { RESTAURANTS } from '@/lib/restaurants';
@@ -26,26 +26,23 @@ interface TotalsData {
 export default function TotalsPage() {
   const router = useRouter();
   const [data, setData] = useState<TotalsData | null>(null);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  async function fetchTotals() {
-    const res = await fetch('/api/totals');
-    if (res.status === 401) {
-      router.replace('/');
-      return;
-    }
-    if (res.ok) {
-      setData(await res.json());
-    }
-  }
 
   useEffect(() => {
+    async function fetchTotals() {
+      const res = await fetch('/api/totals');
+      if (res.status === 401) {
+        router.replace('/');
+        return;
+      }
+      if (res.ok) {
+        setData(await res.json());
+      }
+    }
+
     fetchTotals();
-    intervalRef.current = setInterval(fetchTotals, 2000);
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, []);
+    const id = setInterval(fetchTotals, 2000);
+    return () => clearInterval(id);
+  }, [router]);
 
   if (!data) {
     return (
