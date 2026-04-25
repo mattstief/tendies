@@ -18,6 +18,6 @@ export async function POST(req: NextRequest) {
   }
 
   const key = [a, b].sort().join('||');
-  await redis.hset(`preferences:${username}`, key, winner);
+  await redis.hset(`preferences:${username}`, { [key]: winner });
   return NextResponse.json({ ok: true });
 }

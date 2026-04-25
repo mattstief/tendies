@@ -39,6 +39,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid rating' }, { status: 400 });
   }
 
-  await redis.hset(`ratings:${username}`, restaurant, score.toString());
+  await redis.hset(`ratings:${username}`, { [restaurant]: score.toString() });
   return NextResponse.json({ ok: true });
 }

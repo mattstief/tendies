@@ -1,67 +1,63 @@
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
-import redis from '@/lib/redis';
-import { RESTAURANTS } from '@/lib/restaurants';
-import { calcMatchScore } from '@/lib/scoring';
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { RESTAURANTS } from '@/lib/restaurants';
 
-export default async function TotalsPage() {
-  const cookieStore = cookies();
-  const username = cookieStore.get('tendies_username')?.value;
-  if (!username) redirect('/');
+interface RestaurantRow {
+  name: string;
+  average: number | null;
+  count: number;
+}
 
-  const users = await redis.smembers('users');
+interface UserRow {
+  username: string;
+  ratingCount: number;
+  matchScore: number | null;
+}
 
-  const allRatings: Record<string, Record<string, number>> = {};
-  await Promise.all(
-    users.map(async (user) => {
-      const raw = await redis.hgetall(`ratings:${user}`);
-      const ratings: Record<string, number> = {};
-      for (const [k, v] of Object.entries(raw ?? {})) {
-        ratings[k] = parseInt(v, 10);
-      }
-      allRatings[user] = ratings;
-    })
-  );
+interface TotalsData {
+  restaurants: RestaurantRow[];
+  users: UserRow[];
+  total: number;
+}
 
-  const totals: Record<string, { sum: number; count: number }> = {};
-  for (const r of RESTAURANTS) totals[r] = { sum: 0, count: 0 };
-  for (const ratings of Object.values(allRatings)) {
-    for (const [r, score] of Object.entries(ratings)) {
-      if (totals[r]) {
-        totals[r].sum += score;
-        totals[r].count++;
-      }
+export default function TotalsPage() {
+  const router = useRouter();
+  const [data, setData] = useState<TotalsData | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  async function fetchTotals() {
+    const res = await fetch('/api/totals');
+    if (res.status === 401) {
+      router.replace('/');
+      return;
+    }
+    if (res.ok) {
+      setData(await res.json());
     }
   }
 
-  const aggregateAverages: Record<string, number> = {};
-  const restaurants = [...RESTAURANTS]
-    .map((r) => {
-      const { sum, count } = totals[r];
-      const average = count > 0 ? Math.round((sum / count) * 10) / 10 : null;
-      if (average !== null) aggregateAverages[r] = average;
-      return { name: r, average, count };
-    })
-    .sort((a, b) => {
-      if (a.average === null && b.average === null) return 0;
-      if (a.average === null) return 1;
-      if (b.average === null) return -1;
-      return b.average - a.average;
-    });
+  useEffect(() => {
+    fetchTotals();
+    intervalRef.current = setInterval(fetchTotals, 2000);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
 
-  const userBreakdown = users
-    .map((user) => ({
-      username: user,
-      ratingCount: Object.keys(allRatings[user]).length,
-      matchScore: calcMatchScore(allRatings[user], aggregateAverages),
-    }))
-    .sort((a, b) => {
-      if (a.matchScore === null && b.matchScore === null) return 0;
-      if (a.matchScore === null) return 1;
-      if (b.matchScore === null) return -1;
-      return b.matchScore - a.matchScore;
-    });
+  if (!data) {
+    return (
+      <div className="totals">
+        <header className="totals-header">
+          <Link href="/" className="btn-ghost btn-sm">← Back</Link>
+          <h1 className="totals-title">Aggregate Rankings</h1>
+        </header>
+        <p style={{ textAlign: 'center', color: 'var(--text-muted)', marginTop: '2rem' }}>Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="totals">
@@ -73,7 +69,7 @@ export default async function TotalsPage() {
       <section className="totals-section">
         <h2 className="section-heading">Restaurants</h2>
         <ul className="totals-list">
-          {restaurants.map((r) => (
+          {data.restaurants.map((r) => (
             <li key={r.name} className="totals-row">
               <span className="totals-name">{r.name}</span>
               <span className="totals-avg">
@@ -90,7 +86,7 @@ export default async function TotalsPage() {
       <section className="totals-section">
         <h2 className="section-heading">Users</h2>
         <ul className="totals-list">
-          {userBreakdown.map((u) => (
+          {data.users.map((u) => (
             <li key={u.username} className="totals-row">
               <span className="totals-name">{u.username}</span>
               <span className="totals-count">{u.ratingCount}/{RESTAURANTS.length} rated</span>
