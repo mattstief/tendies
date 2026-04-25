@@ -1,0 +1,56 @@
+<h2>Tie-breaker: head-to-head comparison</h2>
+<p class="subtitle">When two restaurants share the same score, how should the matchup look?</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0f0f0f;padding:16px;display:flex;flex-direction:column;align-items:center;gap:10px">
+      <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px">Both rated 8 — pick your favorite</div>
+      <div style="display:flex;width:100%;gap:10px;align-items:stretch">
+        <div style="flex:1;background:#1a1a1a;border:2px solid #333;border-radius:12px;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:8px">
+          <div style="font-size:22px">🍗</div>
+          <div style="font-weight:700;font-size:14px;color:#fff;text-align:center">Chick-fil-A</div>
+          <div style="font-size:11px;color:#888">rated 8</div>
+          <div style="margin-top:auto;background:#e8a020;color:#000;border-radius:8px;padding:7px 14px;font-weight:700;font-size:13px;width:100%;text-align:center">Pick this</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;color:#555;font-size:12px;font-weight:700;gap:4px">
+          <div style="width:1px;flex:1;background:#333"></div>
+          <div>VS</div>
+          <div style="width:1px;flex:1;background:#333"></div>
+        </div>
+        <div style="flex:1;background:#1a1a1a;border:2px solid #333;border-radius:12px;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:8px">
+          <div style="font-size:22px">🍗</div>
+          <div style="font-weight:700;font-size:14px;color:#fff;text-align:center">Cane's</div>
+          <div style="font-size:11px;color:#888">rated 8</div>
+          <div style="margin-top:auto;background:#e8a020;color:#000;border-radius:8px;padding:7px 14px;font-weight:700;font-size:13px;width:100%;text-align:center">Pick this</div>
+        </div>
+      </div>
+      <div style="color:#555;font-size:11px">or</div>
+      <div style="background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:7px 20px;color:#666;font-size:12px">They're equal — keep the tie</div>
+    </div>
+    <div class="card-body">
+      <h3>A — Side by side with "Keep Tie" escape</h3>
+      <p>Both options shown as equal cards. User picks one or declares a true tie. Clean and scannable.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0f0f0f;padding:16px;display:flex;flex-direction:column;align-items:center;gap:10px">
+      <div style="font-size:11px;color:#e8a020;text-transform:uppercase;letter-spacing:1px;font-weight:700">⚡ Tiebreaker Round</div>
+      <div style="font-size:12px;color:#888;text-align:center">You rated both an 8 — which tendies actually win?</div>
+      <div style="width:100%;background:#1a1a1a;border:2px solid #e8a020;border-radius:12px;padding:16px;display:flex;align-items:center;justify-content:space-between">
+        <div style="font-weight:700;font-size:16px;color:#fff">Chick-fil-A</div>
+        <div style="background:#e8a020;color:#000;border-radius:6px;padding:5px 14px;font-weight:700;font-size:13px">Choose →</div>
+      </div>
+      <div style="color:#555;font-size:12px;font-weight:700">VS</div>
+      <div style="width:100%;background:#1a1a1a;border:2px solid #e8a020;border-radius:12px;padding:16px;display:flex;align-items:center;justify-content:space-between">
+        <div style="font-weight:700;font-size:16px;color:#fff">Cane's</div>
+        <div style="background:#e8a020;color:#000;border-radius:6px;padding:5px 14px;font-weight:700;font-size:13px">Choose →</div>
+      </div>
+      <div style="color:#555;font-size:11px;margin-top:2px">skip → keep as tied</div>
+    </div>
+    <div class="card-body">
+      <h3>B — Stacked "Tiebreaker Round" prompt</h3>
+      <p>More dramatic framing, stacked rows rather than columns. Feels like a tournament. Easier to read long restaurant names.</p>
+    </div>
+  </div>
+</div>

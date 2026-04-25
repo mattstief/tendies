@@ -6,10 +6,10 @@ import { RestaurantList } from './RestaurantList';
 import { RatingSheet } from './RatingSheet';
 import { TiebreakerSheet } from './TiebreakerSheet';
 import { getNewTiePairs } from '@/lib/scoring';
-import { RESTAURANTS } from '@/lib/restaurants';
 import type { Ratings, Preferences } from '@/lib/scoring';
 
 interface HomeClientProps {
+  restaurants: string[];
   initialRatings: Ratings;
   initialPreferences: Preferences;
 }
@@ -20,7 +20,7 @@ interface TiePair {
   score: number;
 }
 
-export function HomeClient({ initialRatings, initialPreferences }: HomeClientProps) {
+export function HomeClient({ restaurants, initialRatings, initialPreferences }: HomeClientProps) {
   const [ratings, setRatings] = useState<Ratings>(initialRatings);
   const [preferences, setPreferences] = useState<Preferences>(initialPreferences);
   const [activeRestaurant, setActiveRestaurant] = useState<string | null>(null);
@@ -43,9 +43,7 @@ export function HomeClient({ initialRatings, initialPreferences }: HomeClientPro
 
     const pairs = getNewTiePairs(activeRestaurant, score, ratings, preferences);
     if (pairs.length > 0) {
-      setTiePairs(
-        pairs.map(([a, b]) => ({ a, b, score }))
-      );
+      setTiePairs(pairs.map(([a, b]) => ({ a, b, score })));
     }
   }
 
@@ -79,11 +77,12 @@ export function HomeClient({ initialRatings, initialPreferences }: HomeClientPro
         </button>
       </header>
       <p className="home-progress">
-        {ratedCount}/{RESTAURANTS.length} rated
-        {ratedCount < RESTAURANTS.length && ' — rate them all!'}
+        {ratedCount}/{restaurants.length} rated
+        {ratedCount < restaurants.length && ' — rate them all!'}
       </p>
 
       <RestaurantList
+        restaurants={restaurants}
         ratings={ratings}
         preferences={preferences}
         onSelect={setActiveRestaurant}

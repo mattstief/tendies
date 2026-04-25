@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import redis from '@/lib/redis';
+import { getRestaurants } from '@/lib/restaurants';
 import { UsernameEntry } from '@/components/UsernameEntry';
 import { HomeClient } from '@/components/HomeClient';
 
@@ -11,9 +12,10 @@ export default async function Page() {
     return <UsernameEntry />;
   }
 
-  const [rawRatings, rawPreferences] = await Promise.all([
+  const [rawRatings, rawPreferences, restaurants] = await Promise.all([
     redis.hgetall(`ratings:${username}`),
     redis.hgetall(`preferences:${username}`),
+    getRestaurants(redis),
   ]);
 
   const ratings: Record<string, number> = {};
@@ -23,6 +25,7 @@ export default async function Page() {
 
   return (
     <HomeClient
+      restaurants={restaurants}
       initialRatings={ratings}
       initialPreferences={(rawPreferences as Record<string, string>) ?? {}}
     />

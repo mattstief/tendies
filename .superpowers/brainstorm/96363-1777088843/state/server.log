@@ -1,0 +1,10 @@
+{"type":"server-started","port":49602,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:49602","screen_dir":"/Users/mstieferman/tendies/.superpowers/brainstorm/96363-1777088843/content","state_dir":"/Users/mstieferman/tendies/.superpowers/brainstorm/96363-1777088843/state"}
+{"type":"screen-added","file":"/Users/mstieferman/tendies/.superpowers/brainstorm/96363-1777088843/content/rating-ui.html"}
+{"source":"user-event","type":"click","text":"Swipe to score\n      \n        ← Low\n        \n          8\n          current\n        \n        High →\n      \n      \n        \n        \n        \n        \n        \n      \n      Submit 8/10\n    \n    \n      C — Swipe Cards\n      Swipe left/right to nudge the score up or down. Satisfying on mobile, but slowest to reach a specific number.","choice":"c","id":null,"timestamp":1777089054324}
+{"type":"screen-added","file":"/Users/mstieferman/tendies/.superpowers/brainstorm/96363-1777088843/content/tiebreaker-ui.html"}
+{"source":"user-event","type":"click","text":"Both rated 8 — pick your favorite\n      \n        \n          🍗\n          Chick-fil-A\n          rated 8\n          Pick this\n        \n        \n          \n          VS\n          \n        \n        \n          🍗\n          Cane's\n          rated 8\n          Pick this\n        \n      \n      or\n      They're equal — keep the tie\n    \n    \n      A — Side by side with \"Keep Tie\" escape\n      Both options shown as equal cards. User picks one or declares a true tie. Clean and scannable.","choice":"a","id":null,"timestamp":1777089163739}
+{"type":"screen-added","file":"/Users/mstieferman/tendies/.superpowers/brainstorm/96363-1777088843/content/tiebreaker-v2.html"}
+{"type":"screen-added","file":"/Users/mstieferman/tendies/.superpowers/brainstorm/96363-1777088843/content/waiting-1.html"}
+{"type":"screen-added","file":"/Users/mstieferman/tendies/.superpowers/brainstorm/96363-1777088843/content/threeway-tie.html"}
+{"type":"screen-added","file":"/Users/mstieferman/tendies/.superpowers/brainstorm/96363-1777088843/content/waiting-2.html"}
+{"type":"server-stopped","reason":"idle timeout"}

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import redis from '@/lib/redis';
-import { RESTAURANTS } from '@/lib/restaurants';
+import { getRestaurants } from '@/lib/restaurants';
 import { calcMatchScore } from '@/lib/scoring';
 
 export async function GET(req: NextRequest) {
@@ -9,7 +9,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Not logged in' }, { status: 401 });
   }
 
-  const users = await redis.smembers('users');
+  const [users, restaurantList] = await Promise.all([
+    redis.smembers('users'),
+    getRestaurants(redis),
+  ]);
 
   const allRatings: Record<string, Record<string, number>> = {};
   await Promise.all(
@@ -24,7 +27,7 @@ export async function GET(req: NextRequest) {
   );
 
   const totals: Record<string, { sum: number; count: number }> = {};
-  for (const r of RESTAURANTS) totals[r] = { sum: 0, count: 0 };
+  for (const r of restaurantList) totals[r] = { sum: 0, count: 0 };
 
   for (const ratings of Object.values(allRatings)) {
     for (const [restaurant, score] of Object.entries(ratings)) {
@@ -36,7 +39,7 @@ export async function GET(req: NextRequest) {
   }
 
   const aggregateAverages: Record<string, number> = {};
-  const restaurants = [...RESTAURANTS]
+  const restaurants = restaurantList
     .map((r) => {
       const { sum, count } = totals[r];
       const average = count > 0 ? Math.round((sum / count) * 10) / 10 : null;
@@ -70,5 +73,5 @@ export async function GET(req: NextRequest) {
         : joinedAt[a.username] - joinedAt[b.username]
     );
 
-  return NextResponse.json({ restaurants, users: userBreakdown, total: RESTAURANTS.length });
+  return NextResponse.json({ restaurants, users: userBreakdown, total: restaurantList.length });
 }

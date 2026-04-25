@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { RESTAURANTS } from '@/lib/restaurants';
 
 interface RestaurantRow {
   name: string;
@@ -86,7 +85,7 @@ export default function TotalsPage() {
           {data.users.map((u) => (
             <li key={u.username} className="totals-row">
               <span className="totals-name">{u.username}</span>
-              <span className="totals-count">{u.ratingCount}/{RESTAURANTS.length} rated</span>
+              <span className="totals-count">{u.ratingCount}/{data.total} rated</span>
               <span className="totals-avg">
                 {u.matchScore !== null ? `${u.matchScore}%` : '—'}
               </span>

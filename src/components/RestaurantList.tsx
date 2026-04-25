@@ -1,17 +1,17 @@
 'use client';
 
-import { RESTAURANTS } from '@/lib/restaurants';
 import { sortRestaurants } from '@/lib/scoring';
 import type { Ratings, Preferences } from '@/lib/scoring';
 
 interface RestaurantListProps {
+  restaurants: string[];
   ratings: Ratings;
   preferences: Preferences;
   onSelect: (restaurant: string) => void;
 }
 
-export function RestaurantList({ ratings, preferences, onSelect }: RestaurantListProps) {
-  const sorted = sortRestaurants(RESTAURANTS, ratings, preferences);
+export function RestaurantList({ restaurants, ratings, preferences, onSelect }: RestaurantListProps) {
+  const sorted = sortRestaurants(restaurants, ratings, preferences);
 
   return (
     <ul className="restaurant-list">
