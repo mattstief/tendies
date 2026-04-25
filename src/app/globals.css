@@ -1,14 +1,14 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #0a0a0a;
-  --surface: #141414;
-  --surface2: #1e1e1e;
-  --border: #2a2a2a;
-  --text: #f0f0f0;
-  --text-dim: #666;
-  --accent: #e8a020;
-  --accent-fg: #000;
+  --bg: #060d18;
+  --surface: #0b1929;
+  --surface2: #101f33;
+  --border: #1c3452;
+  --text: #d6eeff;
+  --text-dim: #4b7a99;
+  --accent: #00c8a8;
+  --accent-fg: #001c14;
   --radius: 12px;
   --sheet-radius: 20px;
 }
@@ -79,7 +79,7 @@ body {
   outline: none;
 }
 .entry-input:focus { border-color: var(--accent); }
-.entry-error { color: #e05; font-size: 13px; }
+.entry-error { color: #f05a3a; font-size: 13px; }
 
 /* Home */
 .home { padding: 0 0 80px; }
@@ -340,11 +340,11 @@ body {
   outline: none;
 }
 .admin-input:focus { border-color: var(--accent); }
-.admin-error { font-size: 13px; color: #e05; margin-top: 6px; }
+.admin-error { font-size: 13px; color: #f05a3a; margin-top: 6px; }
 .btn-danger {
   background: transparent;
-  color: #e05;
-  border: 1px solid #e05;
+  color: #f05a3a;
+  border: 1px solid #f05a3a;
   border-radius: var(--radius);
   padding: 14px 24px;
   font-size: 14px;
@@ -353,4 +353,4 @@ body {
   white-space: nowrap;
 }
 .btn-danger.btn-sm { padding: 8px 14px; font-size: 13px; }
-.btn-danger:hover { background: rgba(238, 0, 85, 0.08); }
+.btn-danger:hover { background: rgba(240, 90, 58, 0.1); }
