@@ -29,6 +29,9 @@ interface TotalsData {
 export default function TotalsPage() {
   const router = useRouter();
   const [data, setData] = useState<TotalsData | null>(null);
+  const [revealDismissed, setRevealDismissed] = useState(() =>
+    typeof window !== 'undefined' && localStorage.getItem('tendies_reveal_seen') === '1'
+  );
 
   useEffect(() => {
     async function fetchTotals() {
@@ -77,7 +80,16 @@ export default function TotalsPage() {
 
   return (
     <>
-      {data.reveal && <RevealOverlay restaurants={data.restaurants} users={data.users} />}
+      {data.reveal && !revealDismissed && (
+        <RevealOverlay
+          restaurants={data.restaurants}
+          users={data.users}
+          onDismiss={() => {
+            localStorage.setItem('tendies_reveal_seen', '1');
+            setRevealDismissed(true);
+          }}
+        />
+      )}
       <div className="totals">
         <header className="totals-header">
           <Link href="/" className="btn-ghost btn-sm">← Back</Link>

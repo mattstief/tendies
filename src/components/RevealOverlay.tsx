@@ -16,6 +16,7 @@ interface UserRow {
 interface RevealOverlayProps {
   restaurants: RestaurantRow[];
   users: UserRow[];
+  onDismiss: () => void;
 }
 
 type Phase = 'drumroll' | 'restaurants' | 'users' | 'done';
@@ -24,7 +25,7 @@ const DRUMROLL_MS = 3500;
 const CARD_INTERVAL_MS = 1400;
 const SECTION_PAUSE_MS = 2000;
 
-export function RevealOverlay({ restaurants, users }: RevealOverlayProps) {
+export function RevealOverlay({ restaurants, users, onDismiss }: RevealOverlayProps) {
   const [phase, setPhase] = useState<Phase>('drumroll');
   const [visibleR, setVisibleR] = useState(0);
   const [visibleU, setVisibleU] = useState(0);
@@ -118,6 +119,12 @@ export function RevealOverlay({ restaurants, users }: RevealOverlayProps) {
                 </div>
               ))}
             </div>
+          )}
+
+          {phase === 'done' && (
+            <button className="btn-primary" style={{ maxWidth: 320, marginTop: 8 }} onClick={onDismiss}>
+              See Full Results
+            </button>
           )}
         </>
       )}
