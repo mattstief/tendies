@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import redis from '@/lib/redis';
 import { getRestaurants } from '@/lib/restaurants';
+import { recomputeAllMatchScores } from '@/lib/matchScores';
 
 export async function POST(
   _req: NextRequest,
@@ -20,5 +21,6 @@ export async function POST(
     redis.set(`joined:${username}`, Date.now(), { nx: true }),
   ]);
 
+  recomputeAllMatchScores().catch(() => {});
   return NextResponse.json({ ok: true });
 }
