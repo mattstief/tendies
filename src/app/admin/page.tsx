@@ -88,6 +88,14 @@ export default function AdminPage() {
     loadUsers();
   }
 
+  async function startReveal() {
+    await fetch('/api/admin/reveal', { method: 'POST' });
+  }
+
+  async function resetReveal() {
+    await fetch('/api/admin/reveal', { method: 'DELETE' });
+  }
+
   async function removeRestaurant(name: string) {
     if (!confirm(`Remove "${name}" from the list?`)) return;
     await fetch(`/api/admin/restaurants/${encodeURIComponent(name)}`, { method: 'DELETE' });
@@ -122,6 +130,8 @@ export default function AdminPage() {
       <section className="admin-section">
         <p className="admin-section-title">Global Actions</p>
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <button className="btn-primary btn-sm" onClick={startReveal}>Start Reveal</button>
+          <button className="btn-ghost btn-sm" onClick={resetReveal}>Reset Reveal</button>
           <button className="btn-danger" onClick={deleteAllRatings}>Delete All Ratings</button>
           <button className="btn-danger" onClick={deleteAllUsers}>Delete All Users</button>
         </div>

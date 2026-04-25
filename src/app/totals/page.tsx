@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { scoreToColor } from '@/lib/colors';
+import { RevealOverlay } from '@/components/RevealOverlay';
 
 interface RestaurantRow {
   name: string;
@@ -20,6 +22,7 @@ interface TotalsData {
   restaurants: RestaurantRow[];
   users: UserRow[];
   total: number;
+  reveal: boolean;
 }
 
 export default function TotalsPage() {
@@ -56,6 +59,8 @@ export default function TotalsPage() {
   }
 
   return (
+    <>
+    {data.reveal && <RevealOverlay restaurants={data.restaurants} users={data.users} />}
     <div className="totals">
       <header className="totals-header">
         <Link href="/" className="btn-ghost btn-sm">← Back</Link>
@@ -68,7 +73,10 @@ export default function TotalsPage() {
           {data.restaurants.map((r) => (
             <li key={r.name} className="totals-row">
               <span className="totals-name">{r.name}</span>
-              <span className="totals-avg">
+              <span
+                className="totals-avg"
+                style={r.average !== null ? { color: scoreToColor(r.average) } : undefined}
+              >
                 {r.average !== null ? r.average.toFixed(1) : '—'}
               </span>
               <span className="totals-count">
@@ -94,5 +102,6 @@ export default function TotalsPage() {
         </ul>
       </section>
     </div>
+    </>
   );
 }

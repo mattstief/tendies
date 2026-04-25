@@ -1,6 +1,7 @@
 'use client';
 
 import { sortRestaurants } from '@/lib/scoring';
+import { scoreToColor } from '@/lib/colors';
 import type { Ratings, Preferences } from '@/lib/scoring';
 
 interface RestaurantListProps {
@@ -25,8 +26,22 @@ export function RestaurantList({ restaurants, ratings, preferences, onSelect }: 
               onClick={() => onSelect(name)}
             >
               <span className="restaurant-name">{name}</span>
-              <span className={`restaurant-score ${rated ? '' : 'dim'}`}>
-                {rated ? `${score}/10` : 'Unranked'}
+              <span className="restaurant-score-wrap">
+                <span
+                  className="restaurant-score"
+                  style={rated ? { color: scoreToColor(score) } : undefined}
+                >
+                  {rated ? `${score}/10` : 'Unranked'}
+                </span>
+                {rated && (
+                  <span
+                    className="score-bar"
+                    style={{
+                      width: `${score / 10 * 100}%`,
+                      background: scoreToColor(score),
+                    }}
+                  />
+                )}
               </span>
             </button>
           </li>

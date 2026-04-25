@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
+import { scoreToColor } from '@/lib/colors';
 
 interface SwipeCardProps {
   score: number;
@@ -50,7 +51,7 @@ export function SwipeCard({ score, onChange }: SwipeCardProps) {
       >
         ←
       </button>
-      <div className="swipe-score">{score}</div>
+      <div className="swipe-score" style={{ color: scoreToColor(score) }}>{score}</div>
       <button
         className="swipe-arrow"
         onClick={() => onChange(clamp(score + 1))}
