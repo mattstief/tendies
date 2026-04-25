@@ -31,13 +31,13 @@ export function HomeClient({ restaurants: initialRestaurants, initialRatings, in
   useEffect(() => {
     const id = setInterval(async () => {
       const res = await fetch('/api/admin/restaurants');
-      if (res.ok) {
-        const { restaurants: updated } = await res.json();
-        setRestaurants(updated);
-      }
+      if (!res.ok) return;
+      const { restaurants: updated, reveal } = await res.json();
+      setRestaurants(updated);
+      if (reveal) router.push('/totals');
     }, 5000);
     return () => clearInterval(id);
-  }, []);
+  }, [router]);
 
   const ratedCount = Object.keys(ratings).length;
 

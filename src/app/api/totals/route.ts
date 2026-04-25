@@ -15,6 +15,10 @@ export async function GET(req: NextRequest) {
     redis.get('reveal:active'),
   ]);
 
+  if (!revealActive) {
+    return NextResponse.json({ locked: true });
+  }
+
   const allRatings: Record<string, Record<string, number>> = {};
   await Promise.all(
     users.map(async (user) => {

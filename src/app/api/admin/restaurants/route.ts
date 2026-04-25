@@ -3,8 +3,11 @@ import redis from '@/lib/redis';
 import { getRestaurants } from '@/lib/restaurants';
 
 export async function GET() {
-  const restaurants = await getRestaurants(redis);
-  return NextResponse.json({ restaurants });
+  const [restaurants, revealActive] = await Promise.all([
+    getRestaurants(redis),
+    redis.get('reveal:active'),
+  ]);
+  return NextResponse.json({ restaurants, reveal: !!revealActive });
 }
 
 export async function POST(req: NextRequest) {
