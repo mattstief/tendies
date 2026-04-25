@@ -309,6 +309,13 @@ body {
   font-weight: 800;
   font-size: 18px;
 }
+.reveal-award-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #4b7a99;
+  margin-bottom: 3px;
+}
 .reveal-overlay .btn-primary {
   background: #00c8a8;
   color: #001c14;

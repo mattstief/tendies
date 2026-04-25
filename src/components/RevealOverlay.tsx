@@ -16,32 +16,56 @@ interface UserRow {
 interface RevealOverlayProps {
   restaurants: RestaurantRow[];
   users: UserRow[];
+  mostControversial: { name: string; stdDev: number } | null;
+  crowdPleaser: { name: string; stdDev: number } | null;
+  contrarian: { username: string; matchScore: number } | null;
+  generousRater: { username: string; avg: number } | null;
+  harshCritic: { username: string; avg: number } | null;
+  mostDedicated: { username: string; count: number } | null;
+  leastDedicated: { username: string; count: number } | null;
   onDismiss: () => void;
 }
 
-type Phase = 'drumroll' | 'restaurants' | 'users' | 'done';
+type Phase = 'drumroll' | 'restaurants' | 'users' | 'awards' | 'done';
 
 const DRUMROLL_MS = 3500;
 const CARD_INTERVAL_MS = 1400;
+const AWARD_INTERVAL_MS = 1000;
 const SECTION_PAUSE_MS = 2000;
 
-export function RevealOverlay({ restaurants, users, onDismiss }: RevealOverlayProps) {
+export function RevealOverlay({
+  restaurants, users,
+  mostControversial, crowdPleaser, contrarian,
+  generousRater, harshCritic, mostDedicated, leastDedicated,
+  onDismiss,
+}: RevealOverlayProps) {
   const [phase, setPhase] = useState<Phase>('drumroll');
   const [visibleR, setVisibleR] = useState(0);
   const [visibleU, setVisibleU] = useState(0);
+  const [visibleA, setVisibleA] = useState(0);
 
   const top3R = restaurants
     .filter((r) => r.average !== null)
     .slice(0, 3)
     .map((r, i) => ({ ...r, rank: i + 1, average: r.average as number }))
-    .reverse(); // reveal 3rd → 2nd → 1st
+    .reverse();
 
   const top3U = [...users]
     .filter((u) => u.matchScore !== null)
     .sort((a, b) => (b.matchScore ?? 0) - (a.matchScore ?? 0))
     .slice(0, 3)
     .map((u, i) => ({ ...u, rank: i + 1, matchScore: u.matchScore as number }))
-    .reverse(); // reveal 3rd → 2nd → 1st
+    .reverse();
+
+  const awards = [
+    mostControversial && { label: 'Most Controversial', name: mostControversial.name, stat: `±${mostControversial.stdDev.toFixed(1)}`, statColor: '#f05a3a' },
+    crowdPleaser      && { label: 'Crowd Pleaser',      name: crowdPleaser.name,      stat: `±${crowdPleaser.stdDev.toFixed(1)}`,      statColor: '#00c8a8' },
+    contrarian        && { label: 'The Contrarian',     name: contrarian.username,    stat: `${contrarian.matchScore}%`,               statColor: '#4b7a99' },
+    generousRater     && { label: 'Most Generous',      name: generousRater.username, stat: `avg ${generousRater.avg.toFixed(1)}`,     statColor: '#00c8a8' },
+    harshCritic       && { label: 'Harshest Critic',    name: harshCritic.username,   stat: `avg ${harshCritic.avg.toFixed(1)}`,       statColor: '#f05a3a' },
+    mostDedicated     && { label: 'Most Dedicated',     name: mostDedicated.username, stat: `${mostDedicated.count} rated`,            statColor: '#00c8a8' },
+    leastDedicated    && { label: 'Least Dedicated',    name: leastDedicated.username,stat: `${leastDedicated.count} rated`,           statColor: '#4b7a99' },
+  ].filter(Boolean) as Array<{ label: string; name: string; stat: string; statColor: string }>;
 
   useEffect(() => {
     const t = setTimeout(() => setPhase('restaurants'), DRUMROLL_MS);
@@ -53,10 +77,7 @@ export function RevealOverlay({ restaurants, users, onDismiss }: RevealOverlayPr
     const timers = top3R.map((_, i) =>
       setTimeout(() => setVisibleR(i + 1), i * CARD_INTERVAL_MS)
     );
-    const done = setTimeout(
-      () => setPhase('users'),
-      top3R.length * CARD_INTERVAL_MS + SECTION_PAUSE_MS
-    );
+    const done = setTimeout(() => setPhase('users'), top3R.length * CARD_INTERVAL_MS + SECTION_PAUSE_MS);
     return () => { timers.forEach(clearTimeout); clearTimeout(done); };
   }, [phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -65,10 +86,16 @@ export function RevealOverlay({ restaurants, users, onDismiss }: RevealOverlayPr
     const timers = top3U.map((_, i) =>
       setTimeout(() => setVisibleU(i + 1), i * CARD_INTERVAL_MS)
     );
-    const done = setTimeout(
-      () => setPhase('done'),
-      top3U.length * CARD_INTERVAL_MS + SECTION_PAUSE_MS
+    const done = setTimeout(() => setPhase('awards'), top3U.length * CARD_INTERVAL_MS + SECTION_PAUSE_MS);
+    return () => { timers.forEach(clearTimeout); clearTimeout(done); };
+  }, [phase]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (phase !== 'awards') return;
+    const timers = awards.map((_, i) =>
+      setTimeout(() => setVisibleA(i + 1), i * AWARD_INTERVAL_MS)
     );
+    const done = setTimeout(() => setPhase('done'), awards.length * AWARD_INTERVAL_MS + SECTION_PAUSE_MS);
     return () => { timers.forEach(clearTimeout); clearTimeout(done); };
   }, [phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -104,17 +131,34 @@ export function RevealOverlay({ restaurants, users, onDismiss }: RevealOverlayPr
             ))}
           </div>
 
-          {(phase === 'users' || phase === 'done') && (
+          {(phase === 'users' || phase === 'awards' || phase === 'done') && (
             <div className="reveal-section">
               <p className="reveal-section-label">Top Rankers</p>
               {top3U.slice(0, visibleU).map((u) => (
                 <div key={u.username} className={`reveal-card ${u.rank === 1 ? 'reveal-card-first' : ''}`}>
-                  <span className="reveal-rank" style={u.rank === 1 ? { color: 'var(--accent)' } : undefined}>
+                  <span className="reveal-rank" style={u.rank === 1 ? { color: '#00c8a8' } : undefined}>
                     #{u.rank}
                   </span>
                   <span className="reveal-card-name">{u.username}</span>
-                  <span className="reveal-card-score" style={{ color: 'var(--accent)' }}>
+                  <span className="reveal-card-score" style={{ color: '#00c8a8' }}>
                     {u.matchScore}%
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {(phase === 'awards' || phase === 'done') && awards.length > 0 && (
+            <div className="reveal-section">
+              <p className="reveal-section-label">Special Awards</p>
+              {awards.slice(0, visibleA).map((award) => (
+                <div key={award.label} className="reveal-card">
+                  <div style={{ flex: 1 }}>
+                    <div className="reveal-award-label">{award.label}</div>
+                    <div className="reveal-card-name">{award.name}</div>
+                  </div>
+                  <span className="reveal-card-score" style={{ color: award.statColor }}>
+                    {award.stat}
                   </span>
                 </div>
               ))}

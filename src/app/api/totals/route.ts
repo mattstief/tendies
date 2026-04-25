@@ -82,5 +82,73 @@ export async function GET(req: NextRequest) {
       return joinedAt[a.username] - joinedAt[b.username];
     });
 
-  return NextResponse.json({ restaurants, users: userBreakdown, total: restaurantList.length, reveal: !!revealActive, revealStarted: revealStarted ?? null });
+  // Std dev per restaurant (requires ≥2 raters)
+  const restaurantScores: Record<string, number[]> = {};
+  for (const r of restaurantList) restaurantScores[r] = [];
+  for (const ratings of Object.values(allRatings)) {
+    for (const [restaurant, score] of Object.entries(ratings)) {
+      if (restaurantScores[restaurant]) restaurantScores[restaurant].push(score);
+    }
+  }
+
+  const statsEligible = restaurantList
+    .map((r) => {
+      const scores = restaurantScores[r];
+      if (scores.length < 2) return null;
+      const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+      const stdDev = Math.sqrt(scores.reduce((sum, s) => sum + (s - avg) ** 2, 0) / scores.length);
+      return { name: r, stdDev: Math.round(stdDev * 10) / 10 };
+    })
+    .filter((r): r is { name: string; stdDev: number } => r !== null);
+
+  const mostControversial = statsEligible.length > 0
+    ? statsEligible.reduce((a, b) => b.stdDev > a.stdDev ? b : a)
+    : null;
+  const crowdPleaser = statsEligible.length > 0
+    ? statsEligible.reduce((a, b) => b.stdDev < a.stdDev ? b : a)
+    : null;
+
+  const usersWithScore = userBreakdown.filter((u) => u.matchScore !== null);
+  const contrarian = usersWithScore.length > 1
+    ? usersWithScore.reduce((a, b) => (b.matchScore! < a.matchScore! ? b : a))
+    : null;
+
+  // Personal average ratings (require ≥3 rated to be meaningful)
+  const personalAvgs = userBreakdown
+    .filter((u) => u.ratingCount >= 3)
+    .map((u) => {
+      const scores = Object.values(allRatings[u.username]);
+      const avg = Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 10) / 10;
+      return { username: u.username, avg };
+    });
+
+  const generousRater = personalAvgs.length > 1
+    ? personalAvgs.reduce((a, b) => b.avg > a.avg ? b : a)
+    : null;
+  const harshCritic = personalAvgs.length > 1
+    ? personalAvgs.reduce((a, b) => b.avg < a.avg ? b : a)
+    : null;
+
+  const ratedUsers = userBreakdown.filter((u) => u.ratingCount > 0);
+  const mostDedicated = ratedUsers.length > 0
+    ? ratedUsers.reduce((a, b) => b.ratingCount > a.ratingCount ? b : a)
+    : null;
+  const leastDedicated = ratedUsers.length > 1
+    ? ratedUsers.reduce((a, b) => b.ratingCount < a.ratingCount ? b : a)
+    : null;
+
+  return NextResponse.json({
+    restaurants,
+    users: userBreakdown,
+    total: restaurantList.length,
+    reveal: !!revealActive,
+    revealStarted: revealStarted ?? null,
+    mostControversial,
+    crowdPleaser,
+    contrarian: contrarian ? { username: contrarian.username, matchScore: contrarian.matchScore as number } : null,
+    generousRater,
+    harshCritic,
+    mostDedicated: mostDedicated ? { username: mostDedicated.username, count: mostDedicated.ratingCount } : null,
+    leastDedicated: leastDedicated ? { username: leastDedicated.username, count: leastDedicated.ratingCount } : null,
+  });
 }
