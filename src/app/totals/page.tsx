@@ -30,8 +30,6 @@ interface TotalsData {
   contrarian: { username: string; matchScore: number } | null;
   generousRater: { username: string; avg: number } | null;
   harshCritic: { username: string; avg: number } | null;
-  mostDedicated: { username: string; count: number } | null;
-  leastDedicated: { username: string; count: number } | null;
 }
 
 export default function TotalsPage() {
@@ -102,8 +100,7 @@ export default function TotalsPage() {
           contrarian={data.contrarian}
           generousRater={data.generousRater}
           harshCritic={data.harshCritic}
-          mostDedicated={data.mostDedicated}
-          leastDedicated={data.leastDedicated}
+
           onDismiss={() => {
             if (data.revealStarted) {
               localStorage.setItem(`tendies_reveal_seen_${data.revealStarted}`, '1');

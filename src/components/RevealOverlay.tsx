@@ -21,8 +21,6 @@ interface RevealOverlayProps {
   contrarian: { username: string; matchScore: number } | null;
   generousRater: { username: string; avg: number } | null;
   harshCritic: { username: string; avg: number } | null;
-  mostDedicated: { username: string; count: number } | null;
-  leastDedicated: { username: string; count: number } | null;
   onDismiss: () => void;
 }
 
@@ -36,7 +34,7 @@ const SECTION_PAUSE_MS = 2000;
 export function RevealOverlay({
   restaurants, users,
   mostControversial, crowdPleaser, contrarian,
-  generousRater, harshCritic, mostDedicated, leastDedicated,
+  generousRater, harshCritic,
   onDismiss,
 }: RevealOverlayProps) {
   const [phase, setPhase] = useState<Phase>('drumroll');
@@ -63,8 +61,6 @@ export function RevealOverlay({
     contrarian        && { label: 'The Contrarian',     name: contrarian.username,    stat: `${contrarian.matchScore}%`,               statColor: '#4b7a99' },
     generousRater     && { label: 'Most Generous',      name: generousRater.username, stat: `avg ${generousRater.avg.toFixed(1)}`,     statColor: '#00c8a8' },
     harshCritic       && { label: 'Harshest Critic',    name: harshCritic.username,   stat: `avg ${harshCritic.avg.toFixed(1)}`,       statColor: '#f05a3a' },
-    mostDedicated     && { label: 'Most Dedicated',     name: mostDedicated.username, stat: `${mostDedicated.count} rated`,            statColor: '#00c8a8' },
-    leastDedicated    && { label: 'Least Dedicated',    name: leastDedicated.username,stat: `${leastDedicated.count} rated`,           statColor: '#4b7a99' },
   ].filter(Boolean) as Array<{ label: string; name: string; stat: string; statColor: string }>;
 
   useEffect(() => {

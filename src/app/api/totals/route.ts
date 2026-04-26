@@ -129,14 +129,6 @@ export async function GET(req: NextRequest) {
     ? personalAvgs.reduce((a, b) => b.avg < a.avg ? b : a)
     : null;
 
-  const ratedUsers = userBreakdown.filter((u) => u.ratingCount > 0);
-  const mostDedicated = ratedUsers.length > 0
-    ? ratedUsers.reduce((a, b) => b.ratingCount > a.ratingCount ? b : a)
-    : null;
-  const leastDedicated = ratedUsers.length > 1
-    ? ratedUsers.reduce((a, b) => b.ratingCount < a.ratingCount ? b : a)
-    : null;
-
   return NextResponse.json({
     restaurants,
     users: userBreakdown,
@@ -148,7 +140,5 @@ export async function GET(req: NextRequest) {
     contrarian: contrarian ? { username: contrarian.username, matchScore: contrarian.matchScore as number } : null,
     generousRater,
     harshCritic,
-    mostDedicated: mostDedicated ? { username: mostDedicated.username, count: mostDedicated.ratingCount } : null,
-    leastDedicated: leastDedicated ? { username: leastDedicated.username, count: leastDedicated.ratingCount } : null,
   });
 }
